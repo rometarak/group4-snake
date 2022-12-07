@@ -5,28 +5,37 @@ using UnityEngine;
 
 public class Snake : MonoBehaviour
 {
-    private Vector2 _direction = Vector2.zero;
-    private List<Transform> snakeSegments;
+    private Vector2 direction = Vector2.zero;
+    private List<Transform> snakeSegments = new List<Transform>();
     public Transform snakeSegmentPrefab;
+    private int beginSize = 2;
+
 
     private void Start(){
-        snakeSegments = new List<Transform>();
-        snakeSegments.Add(this.transform);
+        ResetState();
     }
 
     private void Update(){
         
-        if (Input.GetKeyDown(KeyCode.UpArrow)){
-            _direction = Vector2.up;
+        if (Input.GetKey(KeyCode.UpArrow)){
+            if (direction != Vector2.down){
+                direction = Vector2.up;
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)){
-            _direction = Vector2.left;
+        else if (Input.GetKey(KeyCode.LeftArrow)){
+            if (direction != Vector2.right){
+                direction = Vector2.left;
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow)){
-            _direction = Vector2.right;
+        else if (Input.GetKey(KeyCode.RightArrow)){
+            if (direction != Vector2.left){
+                direction = Vector2.right;
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow)){
-            _direction = Vector2.down;
+        else if (Input.GetKey(KeyCode.DownArrow)){
+            if (direction != Vector2.up){
+                direction = Vector2.down;
+            }
         }
     }
 
@@ -36,8 +45,8 @@ public class Snake : MonoBehaviour
         }
 
         this.transform.position = new Vector3(
-            Mathf.Round(this.transform.position.x) + _direction.x,
-            Mathf.Round(this.transform.position.y) + _direction.y,
+            Mathf.Round(this.transform.position.x) + direction.x,
+            Mathf.Round(this.transform.position.y) + direction.y,
             0.0f
         );
     }
@@ -47,10 +56,27 @@ public class Snake : MonoBehaviour
         segment.position = snakeSegments[snakeSegments.Count - 1].position;
         snakeSegments.Add(segment);
     }
-    
+
+    private void ResetState(){
+        for(int i = 1;i < snakeSegments.Count;i++){
+            Destroy(snakeSegments[i].gameObject);
+        }
+        snakeSegments.Clear();
+        snakeSegments.Add(this.transform);
+
+        for(int i = 1;i < this.beginSize; i++){
+            snakeSegments.Add(Instantiate(this.snakeSegmentPrefab));
+        }
+
+        this.transform.position = Vector3.zero;
+    }
+
     private void OnTriggerEnter2D(Collider2D snake){
         if(snake.tag == "Food"){
             Grow();
+        }else if(snake.tag == "Obstacle"){
+            ResetState();
+            //siia peaks tulema ka game over või siis retry menüü
         }
         
     }
