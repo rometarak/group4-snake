@@ -1,22 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
+using UnityEngine.SceneManagement;
 
 public class Snake : MonoBehaviour
 {
-    private Vector2 direction = Vector2.zero;
-    private List<Transform> snakeSegments = new List<Transform>();
-    public Transform snakeSegmentPrefab;
-    private int beginSize = 2;
 
+    private Vector2 direction = Vector2.zero;                               //Määrame ära alguses liikumise suuna
+    private List<Transform> snakeSegments = new List<Transform>();          //List positsioonidest, kus ussi sabad asuvad
+    public Transform snakeSegmentPrefab;                                    //Ussi saba üksik prefab
+    private int beginSize = 1;                                              //Määrame ussi saba pikkuse alguses
 
+    //Start funktsioon käivitatakse mängu käima pannes 1 korra
     private void Start(){
         ResetState();
     }
-
+    //Update funktsioon jookseb, kui mäng korra iga frame jooksul
     private void Update(){
-        
+        //Määrame ära ussi liikumise jaoks nupud
         if (Input.GetKey(KeyCode.UpArrow)){
             if (direction != Vector2.down){
                 direction = Vector2.up;
@@ -50,14 +52,16 @@ public class Snake : MonoBehaviour
             0.0f
         );
     }
-
+    //Ussi kasvamise funktsioon
     private void Grow(){
         Transform segment = Instantiate(this.snakeSegmentPrefab);
         segment.position = snakeSegments[snakeSegments.Count - 1].position;
         snakeSegments.Add(segment);
     }
-
+    //Funktsioon määrab ära mis juhtub, kui mäng resetib(uss sureb)
     private void ResetState(){
+        ScoreManager.instance.ResetPoint();
+        direction = Vector2.zero;
         for(int i = 1;i < snakeSegments.Count;i++){
             Destroy(snakeSegments[i].gameObject);
         }
@@ -70,11 +74,13 @@ public class Snake : MonoBehaviour
 
         this.transform.position = Vector3.zero;
     }
-
+    //Funktsioon määrab ära mis juhtub, kui tekib collision toidu või seinaga
     private void OnTriggerEnter2D(Collider2D snake){
         if(snake.tag == "Food"){
             Grow();
+            ScoreManager.instance.AddPoint();
         }else if(snake.tag == "Obstacle"){
+            SceneManager.LoadScene("DeathMenu");
             ResetState();
             //siia peaks tulema ka game over või siis retry menüü
         }

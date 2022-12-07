@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class Food : MonoBehaviour
 {
-    public BoxCollider2D grid;
+    public BoxCollider2D grid;  //Määrame ära gridi kuhu toit spawnib
 
+    //Start funktsioon käivitatakse mängu käima pannes 1 korra
     private void Start(){
         RandomizePosition();
     }
-
+    //Funktsioon, mis spawnib toidu randomilt gridi sisse
     private void RandomizePosition(){
 
         Bounds bounds = this.grid.bounds;
@@ -19,7 +20,7 @@ public class Food : MonoBehaviour
 
         this.transform.position = new Vector3(Mathf.Round(x), Mathf.Round(y), 0.0f);
     }
-    
+    //Funktsioon määrab mis juhtub, kui player(uss) toidule pihta läheb
     private void OnTriggerEnter2D(Collider2D snake){
         if(snake.tag == "Player"){
             RandomizePosition();
